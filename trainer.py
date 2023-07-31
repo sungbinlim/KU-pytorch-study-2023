@@ -76,7 +76,7 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
             
         # Evaluate train loss
         if epoch % 5 == 0:
-            print("train loss at {} epoch:{}".format(epoch, train_loss))
+            print("Epoch:{} / Train loss:{}".format(epoch, train_loss))
 
         # Evaluate valid loss
             with torch.no_grad():
@@ -94,7 +94,7 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
                     cnt += correct_cnt
                 valid_loss = valid_loss / len(valid_data)
                 cnt = 100 * cnt / len(valid_data)
-                print("valid MSE loss and accuracy at {} epoch:{} and {}%".format(epoch, valid_loss, cnt))
+                print("Epoch: {} / Valid MSE loss: {} / Accuracy {} %".format(epoch, valid_loss, cnt))
                 valid_losses.append(valid_loss)
             
             if checkpoint:
@@ -123,7 +123,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model = IonPredictor().to(device)
 optimizer = optim.SGD(model.parameters(), lr=lr)
 loss_classifier = nn.CrossEntropyLoss()
-loss_regression = nn.MSELoss()
+loss_regression = nn.MSELoss(reduction='sum')
 
 if __name__ == "__main__":
     train_step = make_train_step(model, train_loss_fn, optimizer)

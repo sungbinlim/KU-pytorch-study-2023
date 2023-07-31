@@ -6,10 +6,10 @@ from trainer import make_valid_step, valid_loss_fn, device, data_dir, model
 
 device = device
 data_dir = data_dir
-batch_size=256
+batch_size = 512
+model = model
 test_data = IonDataset(data_dir, 'test')
 test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
-model = model
 
 checkpoint = torch.load('model_checkpoint.pth')
 model.load_state_dict(checkpoint['model_state_dict'])
