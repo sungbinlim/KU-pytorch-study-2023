@@ -109,22 +109,23 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
 
     return train_losses, valid_losses
 
+# Hyperparameter
+data_dir = './ion_data'
+batch_size = 512
+train_data = IonDataset(data_dir, 'train')
+valid_data = IonDataset(data_dir, 'valid')
+train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8)
+valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
+lr = 0.1
+epochs = 30
+# Training setting
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model = IonPredictor().to(device)
+optimizer = optim.SGD(model.parameters(), lr=lr)
+loss_classifier = nn.CrossEntropyLoss()
+loss_regression = nn.MSELoss()
+
 if __name__ == "__trainer__":
-    # Hyperparameter
-    data_dir = './ion_data'
-    batch_size = 512
-    train_data = IonDataset(data_dir, 'train')
-    valid_data = IonDataset(data_dir, 'valid')
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8)
-    valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
-    lr = 0.1
-    epochs = 30
-    # Training setting
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model = IonPredictor().to(device)
-    optimizer = optim.SGD(model.parameters(), lr=lr)
-    loss_classifier = nn.CrossEntropyLoss()
-    loss_regression = nn.MSELoss()
     train_step = make_train_step(model, train_loss_fn, optimizer)
     valid_step = make_valid_step(model, valid_loss_fn)
     train_loss, valid_loss = train_model(train_dataloader, valid_dataloader, epochs=epochs, checkpoint=True, device=device)
