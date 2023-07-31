@@ -50,7 +50,6 @@ def make_valid_step(model, loss_fn):
         model_prediction = torch.argmax(y_hat[0], axis=1)
         target = torch.argmax(y[0], axis=1)
         correct_cnt = torch.sum(model_prediction == target)
-
         loss_classifier, loss_regressor = loss_fn(y_hat, y)
         
         return loss_classifier.item(), loss_regressor.item(), correct_cnt.item()
@@ -60,7 +59,6 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
     train_losses = []
     valid_losses = []
     for epoch in range(epochs):
-        train_loss = 0
 
         for x_train_batch, y_train_batch_ion, y_train_batch_potential in train_loader:
             # 데이터 로더에서 받은 미니배치를 device 에 업로드
@@ -70,13 +68,12 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
 
             # 미니매치 데이터를 이용해 parameter update
             loss = train_step(x_train_batch, [y_train_batch_ion, y_train_batch_potential])
-            train_loss += loss
-        train_loss = train_loss / len(train_data)    
-        train_losses.append(train_loss)
             
+        train_losses.append(loss)
+        
         # Evaluate train loss
         if epoch % 5 == 0:
-            print("Epoch:{} / Train loss: {}".format(epoch, train_loss))
+            print("Epoch:{} / Train loss: {}".format(epoch, loss))
 
         # Evaluate valid loss
             with torch.no_grad():
@@ -90,19 +87,20 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
                     
                     # 미니매치 데이터를 이용해 performance 평가
                     _, eval_valid_loss_regressor, correct_cnt = valid_step(x_valid_batch, [y_valid_batch_ion, y_valid_batch_potential])
-                    valid_loss += eval_valid_loss_regressor
+                    valid_loss += eval_valid_loss_regressor * batch_size
                     cnt += correct_cnt
                 valid_loss = valid_loss / len(valid_data)
-                cnt = 100 * cnt / len(valid_data)
-                print("Epoch: {} / Valid MSE loss: {} / Accuracy {} %".format(epoch, valid_loss, cnt))
                 valid_losses.append(valid_loss)
+                cnt = 100 * cnt / len(valid_data)
+                
+                print("Epoch: {} / Valid MSE loss: {} / Accuracy {} %".format(epoch, valid_loss, cnt))
             
             if checkpoint:
                 checkpoint = {'epochs': epoch,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'train_loss': train_losses,
-                'test_loss': valid_losses
+                'valid_loss': valid_losses
                 }
 
                 torch.save(checkpoint, 'model_checkpoint.pth')
@@ -123,7 +121,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model = IonPredictor().to(device)
 optimizer = optim.SGD(model.parameters(), lr=lr)
 loss_classifier = nn.CrossEntropyLoss()
-loss_regression = nn.MSELoss(reduction='sum')
+loss_regression = nn.MSELoss()
 
 if __name__ == "__main__":
     train_step = make_train_step(model, train_loss_fn, optimizer)

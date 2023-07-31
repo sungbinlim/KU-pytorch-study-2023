@@ -27,7 +27,7 @@ with torch.no_grad():
         
         # 미니매치 데이터를 이용해 performance 평가
         _, eval_test_loss_regressor, correct_cnt = test_step(x_test_batch, [y_test_batch_ion, y_test_batch_potential])
-        test_MSE_loss += eval_test_loss_regressor
+        test_MSE_loss += eval_test_loss_regressor * batch_size
         cnt += correct_cnt
     test_loss = test_MSE_loss / len(test_data)
     cnt = 100 * cnt / len(test_data)
