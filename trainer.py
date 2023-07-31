@@ -39,7 +39,7 @@ def train_model(train_loader, valid_loader, epochs=100):
                     x_valid_batch = x_valid_batch.to(device)
                     y_valid_batch_ion = y_valid_batch_ion.to(device)
                     y_valid_batch_potential = y_valid_batch_potential.to(device)
-                    eval_valid_loss = valid_step(x_valid_batch, )
+                    eval_valid_loss = valid_step(x_valid_batch, [y_valid_batch_ion, y_valid_batch_potential])
                     valid_loss += eval_valid_loss
                 valid_loss = valid_loss / len(valid_data)
                 print("valid loss at {} epoch:{}".format(epoch, valid_loss))
