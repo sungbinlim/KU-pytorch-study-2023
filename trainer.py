@@ -113,13 +113,13 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
 
 # Hyperparameter
 data_dir = './ion_data'
-batch_size = 256
+batch_size = 512
 train_data = IonDataset(data_dir, 'train')
 valid_data = IonDataset(data_dir, 'valid')
 train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=16)
 valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
 lr = 0.1
-epochs = 50
+epochs = 100
 # Training setting
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model = IonPredictor().to(device)
