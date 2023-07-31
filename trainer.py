@@ -76,7 +76,7 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
             
         # Evaluate train loss
         if epoch % 5 == 0:
-            print("Epoch:{} / Train loss:{}".format(epoch, train_loss))
+            print("Epoch:{} / Train loss: {}".format(epoch, train_loss))
 
         # Evaluate valid loss
             with torch.no_grad():
