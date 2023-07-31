@@ -125,7 +125,7 @@ optimizer = optim.SGD(model.parameters(), lr=lr)
 loss_classifier = nn.CrossEntropyLoss()
 loss_regression = nn.MSELoss()
 
-if __name__ == "__trainer__":
+if __name__ == "__main__":
     train_step = make_train_step(model, train_loss_fn, optimizer)
     valid_step = make_valid_step(model, valid_loss_fn)
     train_loss, valid_loss = train_model(train_dataloader, valid_dataloader, epochs=epochs, checkpoint=True, device=device)
