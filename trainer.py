@@ -57,7 +57,7 @@ def train_model(train_loader, valid_loader, epochs=10):
 
 # Hyperparameter
 data_dir = './ion_data'
-batch_size = 16
+batch_size = 256
 lr = 0.1
 epochs = 100
 model = IonPredictor().to(device)
