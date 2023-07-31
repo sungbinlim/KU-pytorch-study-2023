@@ -36,4 +36,3 @@ class IonPredictor(nn.Module):
         z.view(z.size(0), -1)
         predict = self.mlp(z)
         return predict[:, :4], predict[:, 4]
-        return feat

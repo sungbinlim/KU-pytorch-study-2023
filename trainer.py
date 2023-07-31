@@ -66,4 +66,3 @@ train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, n
 valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
 
 valid_loss = train_model(train_dataloader, valid_dataloader)
-# print(valid_loss)

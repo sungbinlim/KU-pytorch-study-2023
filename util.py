@@ -24,6 +24,7 @@ def make_train_step(model, loss_fn, optimizer):
         return loss.item()
     return train_step_fn
 
+@timer
 def make_valid_step(model, loss_fn):
     def valid_step_fn(x, y):
         model.eval()
