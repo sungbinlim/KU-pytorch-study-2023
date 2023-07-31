@@ -5,6 +5,8 @@ from data import IonDataset
 from torch.utils.data import DataLoader
 from model import IonPredictor
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 def loss_fn(predict, y):
 
     ion_number_target, potential_target = y[0], y[1]
@@ -29,6 +31,9 @@ def train_model(train_loader, valid_loader, epochs=10):
     valid_losses = []
     for epoch in range(epochs):
         for x_train_batch, y_train_batch_ion, y_train_batch_potential in train_loader:
+            x_train_batch = x_train_batch.to(device)
+            y_train_batch_ion = y_train_batch_ion.to(device)
+            y_train_batch_potential = y_train_batch_potential.to(device)
             loss = train_step(x_train_batch, [y_train_batch_ion, y_train_batch_potential])
             
         # Evaluate train loss
@@ -39,6 +44,9 @@ def train_model(train_loader, valid_loader, epochs=10):
             with torch.no_grad():
                 valid_loss = 0
                 for x_valid_batch, y_valid_batch_ion, y_valid_batch_potential in valid_loader:
+                    x_valid_batch = x_valid_batch.to(device)
+                    y_valid_batch_ion = y_valid_batch_ion.to(device)
+                    y_valid_batch_potential = y_valid_batch_potential.to(device)
                     y_hat_val_ion, y_hat_val_potential = model(x_valid_batch)
                     valid_loss += loss_fn([y_hat_val_ion, y_hat_val_potential], [y_valid_batch_ion, y_valid_batch_potential]).detach()
                 valid_loss = valid_loss / 10000
@@ -52,7 +60,7 @@ data_dir = './ion_data'
 batch_size = 16
 lr = 0.1
 epochs = 100
-model = IonPredictor()
+model = IonPredictor().to(device)
 optimizer = optim.SGD(model.parameters(), lr=lr)
 loss_classifier = nn.CrossEntropyLoss()
 loss_regression = nn.MSELoss()
