@@ -1,0 +1,68 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from data import IonDataset
+from torch.utils.data import DataLoader
+from model import IonPredictor
+
+def loss_fn(predict, y):
+
+    ion_number_target, potential_target = y[0], y[1]
+    ion_number_predict, potential_predict = predict[0], predict[1]        
+    loss = loss_classifier(ion_number_predict, ion_number_target) + loss_regression(potential_predict, potential_target)
+    return loss
+
+def make_train_step(model, loss_fn, optimizer):
+    def train_step_fn(x, y):
+
+        model.train()
+        y_hat = model(x)
+        loss = loss_fn(y_hat, y)
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+
+        return loss.item()
+    return train_step_fn
+
+def train_model(train_loader, valid_loader, epochs=10):
+    valid_losses = []
+    for epoch in range(epochs):
+        for x_train_batch, y_train_batch_ion, y_train_batch_potential in train_loader:
+            loss = train_step(x_train_batch, [y_train_batch_ion, y_train_batch_potential])
+            
+        # Evaluate train loss
+        if epoch % 1 == 0:
+            print("train loss at {} epoch:{}".format(epoch, loss))
+
+        # Evaluate valid loss
+            with torch.no_grad():
+                valid_loss = 0
+                for x_valid_batch, y_valid_batch_ion, y_valid_batch_potential in valid_loader:
+                    y_hat_val_ion, y_hat_val_potential = model(x_valid_batch)
+                    valid_loss += loss_fn([y_hat_val_ion, y_hat_val_potential], [y_valid_batch_ion, y_valid_batch_potential]).detach()
+                valid_loss = valid_loss / 10000
+                print("valid loss at {} epoch:{}".format(epoch, valid_loss))
+                valid_losses.append(valid_loss)
+
+    return valid_losses
+
+# Hyperparameter
+data_dir = './ion_data'
+batch_size = 16
+lr = 0.1
+epochs = 100
+model = IonPredictor()
+optimizer = optim.SGD(model.parameters(), lr=lr)
+loss_classifier = nn.CrossEntropyLoss()
+loss_regression = nn.MSELoss()
+
+train_step = make_train_step(model, loss_fn, optimizer)
+
+train_data = IonDataset(data_dir, 'train')
+valid_data = IonDataset(data_dir, 'valid')
+train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
+
+valid_loss = train_model(train_dataloader, valid_dataloader)
+# print(valid_loss)
