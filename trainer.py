@@ -68,6 +68,7 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
 
             # 미니매치 데이터를 이용해 parameter update
             loss = train_step(x_train_batch, [y_train_batch_ion, y_train_batch_potential])
+            wandb.log({'train_loss': loss}, step=epoch)  
             
         train_losses.append(loss)
         
@@ -94,6 +95,8 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
                 cnt = 100 * cnt / len(valid_data)
                 
                 print("Epoch: {} / Valid MSE loss: {} / Accuracy {} %".format(epoch, valid_loss, cnt))
+                wandb.log({'valid_loss': valid_loss}, step=epoch)  
+                wandb.log({'valid_accuracy': cnt}, step=epoch)
             
             if checkpoint:
                 checkpoint = {'epochs': epoch,
@@ -124,6 +127,18 @@ loss_classifier = nn.CrossEntropyLoss()
 loss_regression = nn.MSELoss()
 
 if __name__ == "__main__":
+    import wandb
+    config = {
+    "lr": lr,
+    "epochs": epochs,
+    "batch_size": batch_size,
+    }
+    wandb.login()
+    wandb.init(project="wandb-test-project",  # 현재 run이 logging 될 project 지정
+               name=f"experiment_{1}", 
+               config=config,  # hyperaparameter나 metadata도 저장하고 tracking 할 수 있음
+               )
+    
     train_step = make_train_step(model, train_loss_fn, optimizer)
     valid_step = make_valid_step(model, valid_loss_fn)
     train_loss, valid_loss = train_model(train_dataloader, valid_dataloader, epochs=epochs, checkpoint=True, device=device)
