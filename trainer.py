@@ -62,7 +62,7 @@ valid_step = make_valid_step(model, loss_fn)
 
 train_data = IonDataset(data_dir, 'train')
 valid_data = IonDataset(data_dir, 'valid')
-train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8)
 valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
 
 valid_loss = train_model(train_dataloader, valid_dataloader)
