@@ -5,6 +5,7 @@ from data import IonDataset
 from torch.utils.data import DataLoader
 from model import IonPredictor
 import time
+import wandb
 
 def timer(func):
     def wrapper(*args, **kwargs):
@@ -127,7 +128,6 @@ loss_classifier = nn.CrossEntropyLoss()
 loss_regression = nn.MSELoss()
 
 if __name__ == "__main__":
-    import wandb
     config = {
     "lr": lr,
     "epochs": epochs,
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     }
     wandb.login()
     wandb.init(project="wandb-test-project",  # 현재 run이 logging 될 project 지정
-               name=f"experiment_{1}", 
+               name=f"experiment_{config['lr']}_{config['epochs']}_{config['batch_size']}", 
                config=config,  # hyperaparameter나 metadata도 저장하고 tracking 할 수 있음
                )
     
