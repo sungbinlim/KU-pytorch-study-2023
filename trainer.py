@@ -119,7 +119,7 @@ valid_data = IonDataset(data_dir, 'valid')
 train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=16)
 valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
 lr = 0.1
-epochs = 100
+epochs = 50
 # Training setting
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model = IonPredictor().to(device)
