@@ -29,7 +29,7 @@ def make_valid_step(model, loss_fn, verbose=False):
         loss_classifier, loss_regressor = loss_fn(y_hat, y)
         
         if verbose:
-            return loss_classifier.item(), loss_regressor.item(), target.item(), model_prediction.item()
+            return loss_classifier.item(), loss_regressor.item(), target, model_prediction
         else:
             return loss_classifier.item(), loss_regressor.item(), correct_cnt.item()
     return valid_step_fn
