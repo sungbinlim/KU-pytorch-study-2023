@@ -32,8 +32,8 @@ with torch.no_grad():
         
         # 미니매치 데이터를 이용해 performance 평가
         _, eval_test_loss_regressor, target, predict = test_step(x_test_batch, [y_test_batch_ion, y_test_batch_potential])
-        label_list.append(target.numpy())
-        pred_list.append(predict.numpy())
+        label_list.append(target.cpu().numpy())
+        pred_list.append(predict.cpu().numpy())
         test_MSE_loss += eval_test_loss_regressor * batch_size
     test_loss = test_MSE_loss / len(test_data)
     accuracy = draw_confusion_matrix(label_list, pred_list)
