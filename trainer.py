@@ -88,6 +88,7 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
 
 if __name__ == "__main__":
     
+    # Config file
     config = {
     "lr": 0.1,
     "epochs": 100,
@@ -99,24 +100,23 @@ if __name__ == "__main__":
     "loss_classifier": nn.CrossEntropyLoss,
     "loss_regression": nn.MSELoss,
     }
-    # Reading config file
+
+    # Hyperparameters
     data_dir = config['data_dir']
     lr = config['lr']
     epochs = config['epochs']
     batch_size = config['batch_size']
-
-    # Hyperparameter
-    train_data = IonDataset(data_dir, 'train')
-    valid_data = IonDataset(data_dir, 'valid')
-    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=16)
-    valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
-
-    # Training setting
     device = config['device']
     model = config['model']().to(device)
     optimizer = config['optimizer'](model.parameters(), lr=lr)
     loss_classifier = config['loss_classifier']()
     loss_regression = config['loss_regression']()
+
+    # Data setting
+    train_data = IonDataset(data_dir, 'train')
+    valid_data = IonDataset(data_dir, 'valid')
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=16)
+    valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
 
     wandb.login()
     wandb.init(project="wandb-test-project",  # 현재 run이 logging 될 project 지정
