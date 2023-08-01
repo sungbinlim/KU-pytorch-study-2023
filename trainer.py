@@ -8,6 +8,19 @@ from util import *
 import time
 import wandb
 
+# Config file
+config = {
+"lr": 0.1,
+"epochs": 100,
+"batch_size": 512,
+"data_dir": './ion_data',
+"device": 'cuda' if torch.cuda.is_available() else 'cpu',
+"model": IonPredictor,
+"optimizer": optim.SGD,
+"loss_classifier": nn.CrossEntropyLoss,
+"loss_regression": nn.MSELoss,
+}
+
 def timer(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -88,19 +101,6 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
 
 if __name__ == "__main__":
     
-    # Config file
-    config = {
-    "lr": 0.1,
-    "epochs": 100,
-    "batch_size": 512,
-    "data_dir": './ion_data',
-    "device": 'cuda' if torch.cuda.is_available() else 'cpu',
-    "model": IonPredictor,
-    "optimizer": optim.SGD,
-    "loss_classifier": nn.CrossEntropyLoss,
-    "loss_regression": nn.MSELoss,
-    }
-
     # Hyperparameters
     data_dir = config['data_dir']
     lr = config['lr']

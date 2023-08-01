@@ -2,13 +2,16 @@ import torch
 from data import IonDataset
 from torch.utils.data import DataLoader
 from model import IonPredictor
-from trainer import make_valid_step, valid_loss_fn, device, data_dir, model
+from trainer import make_valid_step, valid_loss_fn, config
 from util import draw_confusion_matrix
 
-device = device
-data_dir = data_dir
+device = config['device']
+data_dir = config['data_dir']
 batch_size = 512
-model = model
+model = config['model']().to(device)
+loss_classifier = config['loss_classifier']()
+loss_regression = config['loss_regression']()
+
 test_data = IonDataset(data_dir, 'test')
 test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 
