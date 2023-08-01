@@ -21,6 +21,9 @@ config = {
 "loss_regression": nn.MSELoss,
 }
 
+loss_classifier = config['loss_classifier']()
+loss_regression = config['loss_regression']()
+
 def timer(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -35,13 +38,13 @@ def valid_loss_fn(predict, y):
 
     ion_number_target, potential_target = y[0], y[1]
     ion_number_predict, potential_predict = predict[0], predict[1]        
-    return config['loss_classifier'](ion_number_predict, ion_number_target), config['loss_regression'](potential_predict, potential_target)
+    return loss_classifier(ion_number_predict, ion_number_target), loss_regression(potential_predict, potential_target)
 
 def train_loss_fn(predict, y):
 
     ion_number_target, potential_target = y[0], y[1]
     ion_number_predict, potential_predict = predict[0], predict[1]        
-    loss = config['loss_classifier'](ion_number_predict, ion_number_target) + config['loss_regression'](potential_predict, potential_target)
+    loss = loss_classifier(ion_number_predict, ion_number_target) + loss_regression(potential_predict, potential_target)
     return loss
 
 def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device='cpu'):
