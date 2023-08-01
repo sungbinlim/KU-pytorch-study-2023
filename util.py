@@ -39,7 +39,7 @@ def draw_confusion_matrix(label_list, pred_list):
     classes = ['5', '6', '7', '8']
     
     label_list = np.concatenate(label_list)
-    pred_list = np.concagtenate(pred_list)
+    pred_list = np.concatenate(pred_list)
 
     confusion_matrix = metrics.confusion_matrix(label_list, pred_list, labels=[i for i in range(num_classes)])
     confusion_matrix = np.round(confusion_matrix / len(label_list), 2)
