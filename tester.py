@@ -4,12 +4,10 @@ from torch.utils.data import DataLoader
 from model import IonPredictor
 from trainer import make_valid_step, valid_loss_fn, config
 from util import draw_confusion_matrix
-import wandb
-import numpy as np
 
 device = config['device']
 data_dir = config['data_dir']
-batch_size = 512
+batch_size = 1024
 model = config['model']().to(device)
 loss_classifier = config['loss_classifier']()
 loss_regression = config['loss_regression']()
@@ -37,18 +35,8 @@ with torch.no_grad():
         label_list.append(target.cpu().numpy())
         pred_list.append(predict.cpu().numpy())
         test_MSE_loss += eval_test_loss_regressor * batch_size
+    
     test_loss = test_MSE_loss / len(test_data)
-    label_list = np.concatenate(label_list)
-    pred_list = np.concatenate(pred_list)
-    wandb.login()
-    wandb.init(project="wandb-test-project",  
-               name=f"experiment_{config['lr']}_{config['epochs']}_{config['batch_size']}", 
-               config=config,  
-               )
-    wandb.log({"confusion_matrix" : wandb.plot.confusion_matrix(probs=None,
-                        y_true=label_list, preds=pred_list,
-                        class_names=['5', '6', '7', '8'])})
-
     accuracy = draw_confusion_matrix(label_list, pred_list)
     print("Test MSE loss:{}, Accuracy: {}%".format(test_loss, accuracy))
     

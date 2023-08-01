@@ -38,6 +38,9 @@ def draw_confusion_matrix(label_list, pred_list):
     num_classes = 4
     classes = ['5', '6', '7', '8']
 
+    label_list = np.concatenate(label_list)
+    pred_list = np.concatenate(pred_list)
+
     confusion_matrix = metrics.confusion_matrix(label_list, pred_list, labels=[i for i in range(num_classes)])
     confusion_matrix = np.round(confusion_matrix / len(label_list), 2)
 
@@ -45,7 +48,12 @@ def draw_confusion_matrix(label_list, pred_list):
     accuracy = total_correct / len(pred_list) * 100
     
     # Create confusion matrix plot
-    img = sns.heatmap(confusion_matrix, annot=True, cmap='Blues', xticklabels=classes, yticklabels=classes)
+    img = sns.heatmap(confusion_matrix, 
+                      annot=True, 
+                      cmap='Blues', 
+                      xticklabels=classes, 
+                      yticklabels=classes)
+    
     # Set plot labels
     plt.xlabel('Predicted label')
     plt.ylabel('True label')
