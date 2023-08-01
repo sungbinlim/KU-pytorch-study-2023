@@ -48,12 +48,12 @@ def draw_confusion_matrix(label_list, pred_list):
     accuracy = total_correct / len(pred_list) * 100
     
     # Create confusion matrix plot
-    sns.heatmap(confusion_matrix, annot=True, cmap='Blues', xticklabels=classes, yticklabels=classes)
+    img = sns.heatmap(confusion_matrix, annot=True, cmap='Blues', xticklabels=classes, yticklabels=classes)
 
     # Set plot labels
     plt.xlabel('Predicted label')
     plt.ylabel('True label')
     plt.title(f'Confusion Matrix - Accuracy: {round(accuracy, 3)}')
-    plt.imsave('test_experiment.png')
+    plt.imsave('test_experiment.png', img)
 
     return accuracy
