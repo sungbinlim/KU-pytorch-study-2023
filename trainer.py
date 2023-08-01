@@ -35,13 +35,13 @@ def valid_loss_fn(predict, y):
 
     ion_number_target, potential_target = y[0], y[1]
     ion_number_predict, potential_predict = predict[0], predict[1]        
-    return loss_classifier(ion_number_predict, ion_number_target), loss_regression(potential_predict, potential_target)
+    return config['loss_classifier'](ion_number_predict, ion_number_target), config['loss_regression'](potential_predict, potential_target)
 
 def train_loss_fn(predict, y):
 
     ion_number_target, potential_target = y[0], y[1]
     ion_number_predict, potential_predict = predict[0], predict[1]        
-    loss = loss_classifier(ion_number_predict, ion_number_target) + loss_regression(potential_predict, potential_target)
+    loss = config['loss_classifier'](ion_number_predict, ion_number_target) + config['loss_regression'](potential_predict, potential_target)
     return loss
 
 def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device='cpu'):
