@@ -54,6 +54,6 @@ def draw_confusion_matrix(label_list, pred_list):
     plt.xlabel('Predicted label')
     plt.ylabel('True label')
     plt.title(f'Confusion Matrix - Accuracy: {round(accuracy, 3)}')
-    plt.save('test_experiment.png')
+    plt.imsave('test_experiment.png')
 
     return accuracy
