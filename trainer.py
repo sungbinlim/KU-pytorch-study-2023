@@ -4,6 +4,7 @@ import torch.optim as optim
 from data import IonDataset
 from torch.utils.data import DataLoader
 from model import IonPredictor
+from util import *
 import time
 import wandb
 
@@ -29,32 +30,6 @@ def train_loss_fn(predict, y):
     ion_number_predict, potential_predict = predict[0], predict[1]        
     loss = loss_classifier(ion_number_predict, ion_number_target) + loss_regression(potential_predict, potential_target)
     return loss
-
-def make_train_step(model, loss_fn, optimizer):
-    def train_step_fn(x, y):
-
-        model.train()
-        y_hat = model(x)
-        loss = loss_fn(y_hat, y)
-        loss.backward()
-        optimizer.step()
-        optimizer.zero_grad()
-
-        return loss.item()
-    return train_step_fn
-
-def make_valid_step(model, loss_fn):
-    
-    def valid_step_fn(x, y):
-        model.eval()
-        y_hat = model(x)        
-        model_prediction = torch.argmax(y_hat[0], axis=1)
-        target = torch.argmax(y[0], axis=1)
-        correct_cnt = torch.sum(model_prediction == target)
-        loss_classifier, loss_regressor = loss_fn(y_hat, y)
-        
-        return loss_classifier.item(), loss_regressor.item(), correct_cnt.item()
-    return valid_step_fn
 
 def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device='cpu'):
     train_losses = []
@@ -111,28 +86,38 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
 
     return train_losses, valid_losses
 
-# Hyperparameter
-data_dir = './ion_data'
-batch_size = 512
-train_data = IonDataset(data_dir, 'train')
-valid_data = IonDataset(data_dir, 'valid')
-train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=16)
-valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
-lr = 0.1
-epochs = 100
-# Training setting
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model = IonPredictor().to(device)
-optimizer = optim.SGD(model.parameters(), lr=lr)
-loss_classifier = nn.CrossEntropyLoss()
-loss_regression = nn.MSELoss()
-
 if __name__ == "__main__":
+    
     config = {
-    "lr": lr,
-    "epochs": epochs,
-    "batch_size": batch_size,
+    "lr": 0.1,
+    "epochs": 100,
+    "batch_size": 512,
+    "data_dir": './ion_data',
+    "device": 'cuda' if torch.cuda.is_available() else 'cpu',
+    "model": IonPredictor,
+    "optimizer": optim.SGD,
+    "loss_classifier": nn.CrossEntropyLoss,
+    "loss_regression": nn.MSELoss,
     }
+    # Reading config file
+    data_dir = config['data_dir']
+    lr = config['lr']
+    epochs = config['epochs']
+    batch_size = config['batch_size']
+
+    # Hyperparameter
+    train_data = IonDataset(data_dir, 'train')
+    valid_data = IonDataset(data_dir, 'valid')
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=16)
+    valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
+
+    # Training setting
+    device = config['device']
+    model = config['model']().to(device)
+    optimizer = config['optimizer'](model.parameters(), lr=lr)
+    loss_classifier = config['loss_classifier']()
+    loss_regression = config['loss_regression']()
+
     wandb.login()
     wandb.init(project="wandb-test-project",  # 현재 run이 logging 될 project 지정
                name=f"experiment_{config['lr']}_{config['epochs']}_{config['batch_size']}", 
