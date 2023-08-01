@@ -10,16 +10,16 @@ import wandb
 
 # Config file
 config = {
-"lr": 0.1,
-"epochs": 100,
-"batch_size": 512,
-"data_dir": './ion_data',
-"device": 'cuda' if torch.cuda.is_available() else 'cpu',
-"model": IonPredictor,
-"optimizer": optim.SGD,
-"loss_classifier": nn.CrossEntropyLoss,
-"loss_regression": nn.MSELoss,
-}
+        "lr": 0.1,
+        "epochs": 40,
+        "batch_size": 512,
+        "data_dir": './ion_data',
+        "device": 'cuda' if torch.cuda.is_available() else 'cpu',
+        "model": IonPredictor,
+        "optimizer": optim.SGD,
+        "loss_classifier": nn.CrossEntropyLoss,
+        "loss_regression": nn.MSELoss,
+        }
 
 loss_classifier = config['loss_classifier']()
 loss_regression = config['loss_regression']()
@@ -65,7 +65,7 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
         train_losses.append(loss)
         
         # Evaluate train loss
-        if epoch % 5 == 0:
+        if epoch % 10 == 0:
             print("Epoch:{} / Train loss: {}".format(epoch, loss))
 
         # Evaluate valid loss
@@ -80,15 +80,15 @@ def train_model(train_loader, valid_loader, epochs=100, checkpoint=False, device
                     
                     # 미니매치 데이터를 이용해 performance 평가
                     _, eval_valid_loss_regressor, correct_cnt = valid_step(x_valid_batch, [y_valid_batch_ion, y_valid_batch_potential])
-                    valid_loss += eval_valid_loss_regressor * batch_size
+                    valid_loss += eval_valid_loss_regressor * len(x_valid_batch)
                     cnt += correct_cnt
                 valid_loss = valid_loss / len(valid_data)
                 valid_losses.append(valid_loss)
-                cnt = 100 * cnt / len(valid_data)
+                accuracy = 100 * cnt / len(valid_data)
                 
-                print("Epoch: {} / Valid MSE loss: {} / Accuracy {} %".format(epoch, valid_loss, cnt))
-                wandb.log({'valid_loss': valid_loss}, step=epoch)  
-                wandb.log({'valid_accuracy': cnt}, step=epoch)
+                print("Epoch: {} / Valid MSE loss: {} / Accuracy {} %".format(epoch, valid_loss, accuracy))
+                wandb.log({'valid_MSE_loss': valid_loss}, step=epoch)  
+                wandb.log({'valid_accuracy': accuracy}, step=epoch)
             
             if checkpoint:
                 checkpoint = {'epochs': epoch,
@@ -122,9 +122,9 @@ if __name__ == "__main__":
     valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=False)
 
     wandb.login()
-    wandb.init(project="wandb-test-project",  # 현재 run이 logging 될 project 지정
+    wandb.init(project="wandb-ion-project-test",  
                name=f"experiment_{config['lr']}_{config['epochs']}_{config['batch_size']}", 
-               config=config,  # hyperaparameter나 metadata도 저장하고 tracking 할 수 있음
+               config=config,  
                )
     
     train_step = make_train_step(model, train_loss_fn, optimizer)
