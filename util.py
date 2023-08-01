@@ -37,9 +37,6 @@ def make_valid_step(model, loss_fn, verbose=False):
 def draw_confusion_matrix(label_list, pred_list):
     num_classes = 4
     classes = ['5', '6', '7', '8']
-    
-    label_list = np.concatenate(label_list)
-    pred_list = np.concatenate(pred_list)
 
     confusion_matrix = metrics.confusion_matrix(label_list, pred_list, labels=[i for i in range(num_classes)])
     confusion_matrix = np.round(confusion_matrix / len(label_list), 2)
